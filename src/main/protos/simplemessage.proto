@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package com.example.streamsproto;
+
+message SimpleMessage {
+  string content = 1;
+  string date_time = 2;
+}

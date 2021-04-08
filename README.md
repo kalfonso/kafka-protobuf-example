@@ -1,0 +1,1 @@
+Code practice of DZone article [How to use protobuf with Apache Kafka and Schema Registry](https://dzone.com/articles/how-to-use-protobuf-with-apache-kafka-and-schema-r)
