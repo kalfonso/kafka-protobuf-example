@@ -21,8 +21,13 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   schemaregistry:
-    image: confluent/schema-registry:latest
+    image: confluentinc/cp-schema-registry:6.1.1
+    container_name: schema-registry
+    environment:
+      - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=kafka:9094
+      - SCHEMA_REGISTRY_HOST_NAME=schemaregistry
     ports:
-      - "8081:8081"
-    links:
+      - 8081:8081/tcp
+    depends_on:
       - zookeeper
+      - kafka
