@@ -1,19 +1,24 @@
 package com.example.streamsproto;
 
+import com.google.protobuf.Descriptors;
+import com.google.protobuf.DynamicMessage;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.util.JsonFormat;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializer;
 import io.confluent.kafka.serializers.protobuf.KafkaProtobufDeserializerConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
-public class SimpleMessageConsumer {
+public class SimpleMessageDynamicConsumer {
     public static void main(String[] args) {
         Properties properties = new Properties();
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
@@ -24,18 +29,26 @@ public class SimpleMessageConsumer {
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaProtobufDeserializer.class);
         properties.put(KafkaProtobufDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG, "http://localhost:8081");
-        properties.put(KafkaProtobufDeserializerConfig.SPECIFIC_PROTOBUF_VALUE_TYPE, Simplemessage.SimpleMessage.class.getName());
 
-        KafkaConsumer<String, Simplemessage.SimpleMessage> consumer = new KafkaConsumer<>(properties);
+        KafkaConsumer<String, DynamicMessage> consumer = new KafkaConsumer<>(properties);
         consumer.subscribe(Collections.singleton("simple_message"));
 
         while (true) {
-            ConsumerRecords<String, Simplemessage.SimpleMessage> records = consumer.poll(Duration.ofMillis(100));
-            for (ConsumerRecord<String, Simplemessage.SimpleMessage> record : records) {
-                System.out.println("Message content: " + record.value().getContent());
-                System.out.println("Message time: " + record.value().getDateTime());
+            ConsumerRecords<String, DynamicMessage> records = consumer.poll(Duration.ofMillis(100));
+            for (ConsumerRecord<String, DynamicMessage> record : records) {
+                String json = convertToJSON(record.value());
+                System.out.println("Message: " + json);
             }
             consumer.commitSync();
+        }
+    }
+
+    private static String convertToJSON(DynamicMessage message) {
+        JsonFormat.Printer printer = JsonFormat.printer();
+        try {
+            return printer.print(message);
+        } catch (InvalidProtocolBufferException e) {
+            throw new RuntimeException(e);
         }
     }
 }

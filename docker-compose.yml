@@ -7,8 +7,8 @@ services:
   kafka:
     image: wurstmeister/kafka:2.12-2.2.1
     ports:
-      - "9092:9092"
-      - "9094:9094"
+      - 9092:9092/tcp
+      - 9094:9094/tcp
     depends_on:
       - zookeeper
     environment:
@@ -17,7 +17,7 @@ services:
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       - KAFKA_INTER_BROKER_LISTENER_NAME=INSIDE
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_CREATE_TOPICS="user_behavior:1:1"
+      - KAFKA_CREATE_TOPICS="simple_message:1:1"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
   schemaregistry:

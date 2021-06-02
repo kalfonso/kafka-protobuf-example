@@ -22,10 +22,10 @@ public class SimpleMessageProducer {
         Producer<String, Simplemessage.SimpleMessage> producer = new KafkaProducer<>(properties);
 
         Simplemessage.SimpleMessage simplemessage = Simplemessage.SimpleMessage.newBuilder()
-                .setContent("Hello World")
+                .setContent("Dimelooo!!!")
                 .setDateTime(Instant.now().toString())
                 .build();
-        ProducerRecord<String, Simplemessage.SimpleMessage> record = new ProducerRecord<>("protobuf-topic", null, simplemessage);
+        ProducerRecord<String, Simplemessage.SimpleMessage> record = new ProducerRecord<>("simple_message", null, simplemessage);
         producer.send(record);
         producer.flush();
         producer.close();
